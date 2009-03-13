@@ -130,7 +130,7 @@ class TestHashConversion < Test::Unit::TestCase
     x = { :a=>1, :b=>1, :c=>3, :d=>nil }
     assert_equal(x, h.dearray_values)    
   end
-
+  
   def test_dearray_singluar_values
     h = { :a=>[1], :b=>[1,2], :c=>3, :d=>[] }
     x = { :a=>1, :b=>[1,2], :c=>3, :d=>nil }
