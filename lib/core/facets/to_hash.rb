@@ -297,21 +297,102 @@ if RUBY_VERSION < "1.9"
     def to_h(mode=nil)
       to_a.to_h(mode)
     end
+
+    # Convert an Enumerable::Enumerator object to a hash by calling 
+    # Array#to_h_auto.
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    def to_h_auto
+      to_a.to_h_auto
+    end
+    
+    # Convert an Enumerable::Enumerator object to a hash by calling 
+    # Array#to_h_splat.
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    def to_h_splat
+      to_a.to_h_splat
+    end
+    
+    # Convert an Enumerable::Enumerator object to a hash by calling 
+    # Array#to_h_flat.
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    def to_h_flat
+      to_a.to_h_flat
+    end
+    
+    # Convert an Enumerable::Enumerator object to a hash by calling 
+    # Array#to_h_assoc.
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    def to_h_assoc
+      to_a.to_h_assoc
+    end
+    
+    # Convert an Enumerable::Enumerator object to a hash by calling 
+    # Array#to_h_multi.
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    def to_h_multi
+      to_a.to_h_multi
+    end
   end
 
 else
 
   class Enumerator
 
-    # Convert an Enumerator object to a hash by calling Array#to_h.
+    # Convert an Enumerator object to a hash. This is equivalent to facets 
+    # Array#to_h. 
     #
+    # CREDIT: Robert Klemme
     # CREDIT: Trans
     # CREDIT: Sandor Szücs
     
     def to_h(mode=nil)
-      to_a.to_h(mode)
+      case mode
+      when :splat
+        return to_h_splat
+      when :flat
+        return to_h_flat
+      when :multi, true
+        return to_h_multi
+      when :assoc
+        return to_h_assoc
+      else
+        return to_h_auto
+      end
     end
+    
+    # Convert an Enumerator object to a hash. This is equivalent to facets 
+    # Array#to_h_auto. 
+    #
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    
+    def to_h_auto
+      pairs = true
+      mixed = false
 
+      each do |e|
+        case e
+        when Array
+          pairs = false if e.size > 2
+        else
+          mixed = true
+        end
+      end
+
+      if mixed
+        to_h_splat
+      elsif pairs
+        to_h_flat
+      else
+        to_h_multi
+      end
+    end
+    
     # This is equivalent to facets Array#to_h_splat. 
     #
     #   e = [:a,1,:b,2,:c].to_enum
@@ -403,4 +484,3 @@ else
   end
 
 end
-
