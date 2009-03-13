@@ -193,7 +193,7 @@ class Array
   #   a = [ [:a,1,2], [:b,2], [:c], :d ]
   #   a.to_h  #=> { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
   #
-  # If the fist entry of any subelements are the same, then
+  # If the first entry of any subelements are the same, then
   # the value will be set to the last occuring value.
   #
   #   a = [ :x, [:x], [:x,1,2], [:x,3], [:x,4] ]
@@ -213,7 +213,7 @@ class Array
   #   a = [ [:a,1,2], [:b,2], [:c], :d ]
   #   a.to_h  #=> { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
   #
-  # If the fist entry of the subelements is the same, then
+  # If the first entry of the subelements is the same, then
   # the values will be merged using #concat.
   #
   #   a = [ [:a,1,2], [:a,3], [:a,4], [:a], :a ]
@@ -441,7 +441,7 @@ else
     #   e = [ [:a,1,2], [:b,2], [:c], :d ].to_enum
     #   e.to_h  #=> { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
     #
-    # If the fist entry of any subelements are the same, then
+    # If the first entry of any subelements are the same, then
     # the value will be set to the last occuring value.
     #
     #   e = [ :x, [:x], [:x,1,2], [:x,3], [:x,4] ].to_enum
@@ -463,7 +463,7 @@ else
     #   a = [ [:a,1,2], [:b,2], [:c], :d ]
     #   a.to_h  #=> { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
     #
-    # If the fist entry of the subelements is the same, then
+    # If the first entry of the subelements is the same, then
     # the values will be merged using #concat.
     #
     #   a = [ [:a,1,2], [:a,3], [:a,4], [:a], :a ]
