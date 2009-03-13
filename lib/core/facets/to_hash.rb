@@ -197,7 +197,7 @@ class Array
   # the value will be set to the last occuring value.
   #
   #   a = [ :x, [:x], [:x,1,2], [:x,3], [:x,4] ]
-  #   a.to_h_assoc  #=> { :x=>4 }
+  #   a.to_h_assoc  #=> { :x=>[4] }
   #
   def to_h_assoc
     h = {}
@@ -290,17 +290,10 @@ if RUBY_VERSION < "1.9"
 
   class Enumerable::Enumerator
   
-    # Convert an Enumerable::Enumerator object directly into a hash.
-    # 
-    #   e = [1,2,3,4,5].to_enum
-    #   e.to_h  #=> {5=>nil, 1=>2, 3=>4}
-    #   e2 = [1,2,1,3,1,5].to_enum
-    #   e2.to_h #=> {1=>5}
-    #   e3 = [[1,:a],[2,:b],[3,:c]].to_enum
-    #   e3.to_h #=> { 1=>:a, 2=>:b, 3=>:c }
-    #
+    # Convert an Enumerable::Enumerator object to a hash by calling Array#to_h.
+    # CREDIT: Trans
     # CREDIT: Sandor Szücs
-
+    
     def to_h(mode=nil)
       to_a.to_h(mode)
     end
@@ -310,34 +303,103 @@ else
 
   class Enumerator
 
-    # Convert an Enumerator object directly into a hash.
-    # 
-    #   e3 = [[1,:a],[2,:b],[3,:c]].to_enum
-    #   e3.to_h #=> { 1=>:a, 2=>:b, 3=>:c }
+    # Convert an Enumerator object to a hash by calling Array#to_h.
     #
-    #   e1 = [1,2,3,4,5].to_enum
-    #   e1.to_h  #=> {5=>nil, 1=>2, 3=>4}
-    #
-    #   e2 = [1,2,1,3,1,5].to_enum
-    #   e2.to_h #=> {1=>5}
-    #
-    #
+    # CREDIT: Trans
     # CREDIT: Sandor Szücs
-
+    
     def to_h(mode=nil)
       to_a.to_h(mode)
     end
 
-    #def to_h
-    #  h = {}
-    #  loop do
-    #    x,y = self.next
-    #    h[x] ||= nil
-    #    y = self.next unless y
-    #    h[x] = y
-    #  end
-    #  return h
-    #end
+    # This is equivalent to facets Array#to_h_splat. 
+    #
+    #   e = [:a,1,:b,2,:c].to_enum
+    #   e.to_h_splat  #=> { :a=>1, :b=>2, :c=>nil }
+    #
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    
+    def to_h_splat
+      each_slice(2).inject({}) {|ha,(k,v)| ha[k]=v; ha}
+    end
+
+    # This is equivalent to facets Array#to_h_flat. 
+    #
+    #   e = [:a,1,[:b,2,:c]].to_enum
+    #   e.to_h_flat  #=> { :a=>1, :b=>2, :c=>nil }
+    #
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    
+    def to_h_flat
+      each_slice(2).inject({}) do |ha,(k,v)| 
+        if k.kind_of?(Array) and v.kind_of?(Array)
+          h = (k | v).to_h_flat
+          ha.merge!(h)
+        elsif k.kind_of?(Array)
+          k = k | [v]
+          # if conversion is too hard use Array#to_h_flat
+          return to_a.to_h_flat if k.length % 2 == 1          
+          h = k.to_h_flat 
+          ha.merge!(h)
+        elsif v.kind_of?(Enumerable)
+          h = {k => v.next}
+          h = v.to_h_flat   # recursion
+          ha.merge!(h)
+        else
+          ha[k]=v
+        end
+
+        ha
+      end
+    end
+    
+    # This is equivalent to facets Array#to_h_assoc. 
+    #
+    #   e = [ [:a,1,2], [:b,2], [:c], :d ].to_enum
+    #   e.to_h  #=> { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
+    #
+    # If the fist entry of any subelements are the same, then
+    # the value will be set to the last occuring value.
+    #
+    #   e = [ :x, [:x], [:x,1,2], [:x,3], [:x,4] ].to_enum
+    #   e.to_h_assoc  #=> { :x=>[4] }
+    #
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+    
+    def to_h_assoc
+      h = {}
+      each do |k,*v| 
+        h[k] = v
+      end
+      h
+    end
+
+    # This is equivalent to facets Array#to_h_multi. 
+    #
+    #   a = [ [:a,1,2], [:b,2], [:c], :d ]
+    #   a.to_h  #=> { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
+    #
+    # If the fist entry of the subelements is the same, then
+    # the values will be merged using #concat.
+    #
+    #   a = [ [:a,1,2], [:a,3], [:a,4], [:a], :a ]
+    #   a.to_h_multi  #=> { :a=>[1,2,3,4,nil,nil] }
+    #
+    # CREDIT: Trans
+    # CREDIT: Sandor Szücs
+
+    def to_h_multi
+      h = {}
+      each do |k,*v| 
+        h[k] ||= []
+        v.empty? ? h[k] << nil : h[k].concat(v)
+      end
+      h
+    end
+
   end
 
 end
