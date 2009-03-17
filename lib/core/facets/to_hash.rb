@@ -217,7 +217,7 @@ class Array
   # the values will be merged using #concat.
   #
   #   a = [ [:a,1,2], [:a,3], [:a,4], [:a], :a ]
-  #   a.to_h_multi  #=> { :a=>[1,2,3,4,nil,nil] }
+  #   a.to_h_multi  #=> { :a=>[1,2,3,4] }
   #
   def to_h_multi
     h = {}
@@ -467,7 +467,7 @@ else
     # the values will be merged using #concat.
     #
     #   a = [ [:a,1,2], [:a,3], [:a,4], [:a], :a ]
-    #   a.to_h_multi  #=> { :a=>[1,2,3,4,nil,nil] }
+    #   a.to_h_multi  #=> { :a=>[1,2,3,4] }
     #
     # CREDIT: Trans
     # CREDIT: Sandor Szücs
@@ -476,7 +476,7 @@ else
       h = {}
       each do |k,*v| 
         h[k] ||= []
-        v.empty? ? h[k] << nil : h[k].concat(v)
+        h[k].concat(v)
       end
       h
     end

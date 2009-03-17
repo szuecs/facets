@@ -56,7 +56,7 @@ class TestArrayConversion < Test::Unit::TestCase
     a2 = [ [:a,1,2], [:b,2], [:c], :d ]
     x2 = { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
     a3 = [ [:a,1,2], [:a,3], [:a,4], [:a], :a ]
-    x3 = { :a=>[1,2,3,4,nil,nil] }
+    x3 = { :a=>[1,2,3,4] }
     assert_equal(x, a.to_h_multi)
     assert_equal(x2, a2.to_h_multi)
     assert_equal(x3, a3.to_h_multi)
@@ -237,7 +237,7 @@ class TestEnumeratorConversion < Test::Unit::TestCase
     e2 = [ [:a,1,2], [:b,2], [:c], :d ]
     x2 = { :a=>[1,2], :b=>[2], :c=>[], :d=>[] }
     e3 = [ [:a,1,2], [:a,3], [:a,4], [:a], :a ]
-    x3 = { :a=>[1,2,3,4,nil,nil] } # false
+    x3 = { :a=>[1,2,3,4] }
     assert_equal(x, e.to_h_multi)
     assert_equal(x, e.to_h(:multi))
     assert_equal(x2, e2.to_h_multi)
